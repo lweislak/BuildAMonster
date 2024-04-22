@@ -40,46 +40,71 @@ class Monster extends Phaser.Scene {
         my.sprite.leftLeg.flipX = true;
 
         //Eyes
-        my.sprite.eye = this.add.sprite(this.bodyX + 30, this.bodyY - 20, "monsterParts", "eye_cute_light.png");
-        my.sprite.eye.setScale(.70); //scale down to 70% of original sprite size
-        my.sprite.eye = this.add.sprite(this.bodyX - 30, this.bodyY - 20, "monsterParts", "eye_cute_light.png");
-        my.sprite.eye.setScale(.70); //scale down to 70% of original sprite size
+        my.sprite.rightEye = this.add.sprite(this.bodyX + 30, this.bodyY - 20, "monsterParts", "eye_cute_light.png");
+        my.sprite.rightEye.setScale(.70); //scale down to 70% of original sprite size
+        my.sprite.leftEye = this.add.sprite(this.bodyX - 30, this.bodyY - 20, "monsterParts", "eye_cute_light.png");
+        my.sprite.leftEye.setScale(.70); //scale down to 70% of original sprite size
 
         //Mouth
         my.sprite.smile = this.add.sprite(this.bodyX, this.bodyY + 25, "monsterParts", "mouthA.png");
         my.sprite.fangs = this.add.sprite(this.bodyX, this.bodyY + 25, "monsterParts", "mouthB.png");
         my.sprite.default = this.add.sprite(this.bodyX, this.bodyY + 25, "monsterParts", "mouthG.png");
-        my.sprite.fangs.visible = false; //starts with fangs invisible
-        my.sprite.smile.visible = false; //TEST
-        
-        let sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S); //set listener for the S key
-        let fKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F); //set listener for the F key
+        my.sprite.fangs.visible = false; //start with fangs invisible
+        my.sprite.smile.visible = false; //start with smile invisibile
+
+        //Set listener for keys
+        this.sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+        this.fKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
+        this.leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+        this.rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
 
         //Change mouth depending on key press
-        sKey.on('down', (key, event) => { //smile when S key is held down
+        //Note: Is it better to move these functions to update() and replace with .isDown?
+        this.sKey.on('down', (key, event) => { //smile when S key is held down
             my.sprite.default.visible = false;
             my.sprite.smile.visible = true;
         });
-        sKey.on('up', (key, event) => { //reset to default when S key is released
+        this.sKey.on('up', (key, event) => { //reset to default when S key is released
             my.sprite.default.visible = true;
             my.sprite.smile.visible = false;
         });
-        fKey.on('down', (key, event) => { //fangs when F key is held down
+        this.fKey.on('down', (key, event) => { //fangs when F key is held down
             my.sprite.default.visible = false;
             my.sprite.fangs.visible = true;
         });
-        fKey.on('up', (key, event) => { //reset to default when F key is released
+        this.fKey.on('up', (key, event) => { //reset to default when F key is released
             my.sprite.default.visible = true;
             my.sprite.fangs.visible = false;
         });
     }
 
     update() {
-        //Hints: use a for loop to move
-        //Note: Use justdown to move monster
         let my = this.my;    // create an alias to this.my for readability
-        
+ 
+        if (this.leftKey.isDown) {
+            this.bodyX--; //decrement X coordinate to move body position left
+            this.updateSpritePosition();
+        } else if (this.rightKey.isDown) {
+            this.bodyX++; //increment X coordinate to move body position right
+            this.updateSpritePosition();
+        }
+    }
+
+    //Move all individual sprites, https://learn.yorkcs.com/2019/09/28/phaser-3-basics-changing-positions/
+    //Note: There has got to be an easier way to do this
+    updateSpritePosition() {
+        let my = this.my;    // create an alias to this.my for readability
+        my.sprite.body.setX(this.bodyX);
+        my.sprite.rightArm.setPosition(this.bodyX + 100, this.bodyY + 50);
+        my.sprite.leftArm.setPosition(this.bodyX - 100, this.bodyY + 50);
+        my.sprite.rightLeg.setPosition(this.bodyX + 50, this.bodyY + 150);
+        my.sprite.leftLeg.setPosition(this.bodyX - 50, this.bodyY + 150);
+        my.sprite.rightEye.setPosition(this.bodyX + 30, this.bodyY - 20);
+        my.sprite.leftEye.setPosition(this.bodyX - 30, this.bodyY - 20);
+        my.sprite.default.setPosition(this.bodyX, this.bodyY + 25);
+        my.sprite.smile.setPosition(this.bodyX, this.bodyY + 25);
+        my.sprite.fangs.setPosition(this.bodyX, this.bodyY + 25);
     }
 
 }
